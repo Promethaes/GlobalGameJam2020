@@ -2,6 +2,7 @@
 #include "Cappuccino/SceneManager.h"
 #include "Cappuccino/GameObject.h"
 #include "Cappuccino/CappInput.h"
+#include "Cappuccino/PointLight.h"
 
 //empty game object, dont add any super fancy behaviour here
 class Empty : public Cappuccino::GameObject {
@@ -10,8 +11,6 @@ public:
 
 	void childUpdate(float dt) override;
 
-	//only works if the shader has a "colour" uniform
-	void setColour(const glm::vec3& colour);
 };
 
 class MainScene : public Cappuccino::Scene {
@@ -24,10 +23,10 @@ public:
 
 	void mouseFunction(double xpos, double ypos) override;
 private:
+	Cappuccino::PointLight _pLight;
 	Cappuccino::CappInput _in;
 
 	Cappuccino::Camera _c;
-	Cappuccino::Shader* _mainShader = nullptr;
 	Empty* _ghoul = nullptr;
 
 };

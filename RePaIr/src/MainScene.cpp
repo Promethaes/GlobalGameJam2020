@@ -1,9 +1,12 @@
 #include "MainScene.h"
 
 MainScene::MainScene(bool yn)
-	:Cappuccino::Scene(yn), _in(true, std::nullopt)
+	:Cappuccino::Scene(yn), _in(true, std::nullopt),
+	_pLight(glm::vec2(1600.0f, 1000.0f), { /*defaultLight*/glm::vec3(-3.0f,0.0f,5.0f),glm::vec3(-3.0f,0.0f,5.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 512.0f)
 {
-	_c.setPosition(_c.getPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
+	_c.setPosition(_c.getPosition() + glm::vec3(0.0f, 0.0f, 0.0f));
+	_pLight._pointLightShader.use();
+	_pLight._pointLightShader.loadViewMatrix(_c);
 }
 
 
@@ -27,33 +30,28 @@ void MainScene::childUpdate(float dt)
 	_c.setPosition(_c.getPosition() + moveForce * dt);
 
 	//load view matrix
-	_mainShader->use();
-	_mainShader->loadViewMatrix(_c);
+	_pLight._pointLightShader.use();
+	_pLight._pointLightShader.loadViewMatrix(_c);
+
 
 	static float elapsedTime = 0.0f;
 	elapsedTime += dt;
 
-	//_ghoul->_rigidBody._position.y = sinf(elapsedTime);
+	_ghoul->_rigidBody._position.y = sinf(elapsedTime);
 
 
 }
 
 bool MainScene::init()
 {
-	//make the shader
-	if (_mainShader == nullptr) {
-		_mainShader = new Cappuccino::Shader("mainVert.vert", "mainFrag.frag");
-		_mainShader->use();
-		_mainShader->loadProjectionMatrix(1600.0f, 1000.0f);
-	}
 
 	//set the cursor so that its locked to the window
 	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//initialize the ghoul and the bullet
 	if (_ghoul == nullptr) {
-		_ghoul = new Empty(*_mainShader, {}, { new Cappuccino::Mesh("rectangle_test.obj") });
-		_ghoul->setColour(glm::vec3(0.5f, 0.2f, 0.8f));
+		_ghoul = new Empty(_pLight._pointLightShader, {new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::DiffuseMap)}, { new Cappuccino::Mesh("rectangle_test.obj") });
+		_ghoul->_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), 90.0f);
 	}
 
 	_ghoul->setActive(true);
@@ -102,10 +100,4 @@ Empty::Empty(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Tex
 void Empty::childUpdate(float dt)
 {
 //	_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), dt * 90.0f);
-}
-
-void Empty::setColour(const glm::vec3& colour)
-{
-	_shader.use();
-	_shader.setUniform("colour", colour);
 }
