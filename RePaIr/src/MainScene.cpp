@@ -2,9 +2,10 @@
 
 MainScene::MainScene(bool yn)
 	:Cappuccino::Scene(yn), _in(true, std::nullopt),
-	_pLight(glm::vec2(1600.0f, 1000.0f), { /*defaultLight*/glm::vec3(-3.0f,0.0f,5.0f),glm::vec3(-3.0f,0.0f,5.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 512.0f)
+	_pLight(glm::vec2(1600.0f, 1000.0f), { /*defaultLight*/glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 512.0f)
 {
-	_c.setPosition(_c.getPosition() + glm::vec3(0.0f, 0.0f, 0.0f));
+	_c.setPosition(glm::vec3(-3.168742f, -1.000000f, -6.126548f));
+	_c.getFront() = glm::vec3(0.011849f, -0.243615f, -0.969800f);
 	_pLight._pointLightShader.use();
 	_pLight._pointLightShader.loadViewMatrix(_c);
 }
@@ -24,8 +25,17 @@ void MainScene::childUpdate(float dt)
 	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::D))
 		moveForce += glm::vec3(_c.getRight().x, 0.0f, _c.getRight().z);
 
+	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::SPACE))
+		moveForce += glm::vec3(0.0f, 1.0f, 0.0f);
+	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::LEFT_SHIFT))
+		moveForce -= glm::vec3(0.0f, 1.0f, 0.0f);
+
+
+
 	float speed = 1.5f;
 	moveForce *= speed;
+
+
 
 	_c.setPosition(_c.getPosition() + moveForce * dt);
 
@@ -37,7 +47,8 @@ void MainScene::childUpdate(float dt)
 	static float elapsedTime = 0.0f;
 	elapsedTime += dt;
 
-	_ghoul->_rigidBody._position.y = sinf(elapsedTime);
+
+	//_ghoul->_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), 90*dt);
 
 
 }
@@ -49,12 +60,13 @@ bool MainScene::init()
 	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//initialize the ghoul and the bullet
-	if (_ghoul == nullptr) {
-		_ghoul = new Empty(_pLight._pointLightShader, {new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::DiffuseMap)}, { new Cappuccino::Mesh("rectangle_test.obj") });
-		_ghoul->_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), 90.0f);
+	if (_table == nullptr) {
+		_table = new Empty(_pLight._pointLightShader, { new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::DiffuseMap) }, { new Cappuccino::Mesh("desk.obj") });
+		_table->_rigidBody._position = -glm::vec3(3.0f, 3.0f, 10.0f);
+		_table->_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 	}
 
-	_ghoul->setActive(true);
+	_table->setActive(true);
 
 	_initialized = true;
 	_shouldExit = false;
@@ -63,7 +75,7 @@ bool MainScene::init()
 
 bool MainScene::exit()
 {
-	_ghoul->setActive(false);
+	_table->setActive(false);
 
 	_initialized = false;
 	_shouldExit = true;
@@ -99,5 +111,4 @@ Empty::Empty(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Tex
 
 void Empty::childUpdate(float dt)
 {
-//	_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), dt * 90.0f);
 }
