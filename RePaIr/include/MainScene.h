@@ -5,6 +5,17 @@
 #include "Cappuccino/PointLight.h"
 #include "Cappuccino/HitBoxLoader.h"
 
+class MachineInteract : public Cappuccino::GameObject {
+public:
+	MachineInteract(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Texture*>& textures, const std::vector<Cappuccino::Mesh*>& meshes,const Cappuccino::HitBox& triggerVolume);
+
+	void childUpdate(float dt) override;
+
+	virtual void trigger() = 0;
+	Cappuccino::HitBox _triggerVolume;
+private:
+};
+
 class HandInteract : public Cappuccino::GameObject {
 public:
 	HandInteract(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Texture*>& textures,unsigned playerNum = 1);

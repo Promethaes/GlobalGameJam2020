@@ -1,4 +1,5 @@
 #include "MainScene.h"
+#include "Cappuccino/CappMath.h"
 
 MainScene::MainScene(bool yn)
 	:Cappuccino::Scene(yn), _in(true, std::nullopt),
@@ -64,7 +65,7 @@ void MainScene::childUpdate(float dt)
 		u = 0.0f;
 		reverse = false;
 	}
-	scalar = 1.0f + 0.1f * glm::lerp(0.1f, 0.2f, u);
+	scalar = 1.0f + 0.1f * glm::smoothstep(0.0f, 1.f, u);
 	_pLight._pointLightShader.setUniform("scalar", scalar);
 	//for (auto x : Cappuccino::GameObject::gameObjects) {
 	//	x->_transform._scaleMat[0].x = offset;
@@ -99,12 +100,14 @@ bool MainScene::init()
 			new Cappuccino::Texture("white.png",Cappuccino::TextureType::SpecularMap),new Cappuccino::Texture("white.png",Cappuccino::TextureType::EmissionMap) });
 		_p1->_rigidBody._position = _table->_rigidBody._position;
 		_p1->_rigidBody._position.y += 1.0f;
+		_p1->_rigidBody._position.x -= 1.0f;
 	}
 	if (_p2 == nullptr) {
 		_p2 = new HandInteract(_pLight._pointLightShader, { new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::DiffuseMap),
 			new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::SpecularMap),new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::EmissionMap) }, 2);
 		_p2->_rigidBody._position = _table->_rigidBody._position;
 		_p2->_rigidBody._position.y += 1.0f;
+		_p2->_rigidBody._position.x += 1.f;
 	}
 
 	_table->setActive(true);
@@ -203,4 +206,15 @@ void HandInteract::childUpdate(float dt)
 	float speed = 1.5f;
 	moveForce *= speed;
 	_rigidBody.setVelocity(moveForce);
+}
+
+MachineInteract::MachineInteract(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Texture*>& textures, const std::vector<Cappuccino::Mesh*>& meshes, const Cappuccino::HitBox& triggerVolume)
+	:GameObject(SHADER,textures,meshes),_triggerVolume(triggerVolume)
+{
+	_rigidBody.setGrav(false);
+}
+
+void MachineInteract::childUpdate(float dt)
+{
+	//something lol
 }
