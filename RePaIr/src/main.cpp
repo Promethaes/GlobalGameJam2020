@@ -1,4 +1,5 @@
 #include "Cappuccino/Application.h"
+#include "MainScene.h"
 
 using Application = Cappuccino::Application;
 using FontManager = Cappuccino::FontManager;
@@ -28,7 +29,7 @@ int main() {
 
 	if (!Application::isInstantiated()) {
 
-		Cappuccino::Viewport view{ glm::vec4(0.0f,0.5f,0.0f,1.0f),glm::vec4(0.0f,0.0f,SCR_WIDTH,SCR_HEIGHT),[]() {} };
+		Cappuccino::Viewport view{ glm::vec4(1.0f,0.0f,1.0f,1.0f),glm::vec4(0.0f,0.0f,SCR_WIDTH,SCR_HEIGHT),[]() {} };
 
 		Application* application = new Application(SCR_WIDTH, SCR_HEIGHT, SCR_TITLE, { view });
 		application->init();
@@ -43,6 +44,9 @@ int main() {
 		Shader::setDefaultPath("./Assets/Shaders/");
 		SoundSystem::setDefaultPath("./Assets/Sounds/");
 		Texture::setDefaultPath("./Assets/Textures/");
+
+		MainScene* m = new MainScene(true);
+		m->init();
 
 		application->run();
 		delete application;

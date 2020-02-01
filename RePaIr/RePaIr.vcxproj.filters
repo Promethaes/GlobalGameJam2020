@@ -12,10 +12,24 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Billboard.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainScene.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\reeee.txt">
       <Filter>include</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\MainScene.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Billboard.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

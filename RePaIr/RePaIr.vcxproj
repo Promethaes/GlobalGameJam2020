@@ -95,10 +95,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Billboard.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MainScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\reeee.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Billboard.h" />
+    <ClInclude Include="include\MainScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
