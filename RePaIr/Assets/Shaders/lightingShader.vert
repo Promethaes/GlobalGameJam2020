@@ -14,6 +14,7 @@ out vec3 FragPos;
 out vec3 TestViewDir;
 out vec2 TexCoords;
 out mat3 TBN;
+uniform float scalar = 1.0f;
 void main()
 {
     vec3 pos = aPos;
@@ -24,7 +25,7 @@ void main()
     vec4 temp4 = temp*(vec4(pos,1.0));
     TestViewDir = -temp4.xyz;
 
-    gl_Position = projection * view * model * vec4(pos, 1.0);
+    gl_Position = projection * view * model * vec4(scalar*pos, 1.0);
     FragPos = vec3(model * vec4(pos, 1.0));
 
 //https://learnopengl.com/Advanced-Lighting/Normal-Mapping

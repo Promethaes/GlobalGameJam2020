@@ -52,9 +52,9 @@ void MainScene::childUpdate(float dt)
 	static float scalar = 0.0f;
 
 	if (reverse)
-		u -= dt;
+		u -= dt * 1.5f;
 	else
-		u += dt;
+		u += dt * 1.5f;
 
 	if (u >= 1.0f) {
 		u = 1.0f;
@@ -64,8 +64,8 @@ void MainScene::childUpdate(float dt)
 		u = 0.0f;
 		reverse = false;
 	}
-	scalar = glm::smoothstep(1.0f, 2.0f, u);
-	_p1->_transform._scaleMat[0].x *= scalar;
+	scalar = 1.0f + 0.1f * glm::lerp(0.1f, 0.2f, u);
+	_pLight._pointLightShader.setUniform("scalar", scalar);
 	//for (auto x : Cappuccino::GameObject::gameObjects) {
 	//	x->_transform._scaleMat[0].x = offset;
 	//	x->_transform._scaleMat[1].y = offset;
