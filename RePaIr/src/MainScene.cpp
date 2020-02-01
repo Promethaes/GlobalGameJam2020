@@ -1,89 +1,75 @@
 #include "MainScene.h"
-#include "Cappuccino/Events.h"
-#include "Cappuccino/Input.h"
 
 MainScene::MainScene(bool yn)
-	:Cappuccino::Scene(yn),
-	_pLight(glm::vec2(1600.0f, 1200.0f), { /*defaultLight*/glm::vec3(-1.0f,0.0f,5.0f),glm::vec3(-3.0f,0.0f,5.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16.0f)
+	:Cappuccino::Scene(yn), _in(true, std::nullopt)
 {
-	_pLight._pointLightShader.use();
+	_c.setPosition(_c.getPosition() + glm::vec3(0.0f, 1.0f, 0.0f));
+}
 
-	c.setPosition(glm::vec3(1.0f, 1.0f, 0.0f));
-	c.lookAt(glm::vec3(0.0f, 0.0f, -3.0f));
-	_pLight._pointLightShader.loadViewMatrix(c);
-	_pLight._pointLightShader.loadProjectionMatrix(1600.0f, 1000.0f);
 
-	_billboardShader.use();
-	_billboardShader.loadViewMatrix(c);
-	_billboardShader.loadProjectionMatrix(1600.0f, 1000.0f);
-	_billboardShader.setUniform("image", 0);
-	for (auto x : _pLight.getPositions()) {
-		_lightCubes.push_back(new Billboard(&_billboardShader, { new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::DiffuseMap) }));
-		_lightCubes.back()->_rigidBody._position = x;
-	}
+void MainScene::childUpdate(float dt)
+{
+	//calculate camera movement
+	auto moveForce = glm::vec3(0.0f, 0.0f, 0.0f);
+	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::W))
+		moveForce += glm::vec3(_c.getFront().x, 0.0f, _c.getFront().z);
+	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::S))
+		moveForce -= glm::vec3(_c.getFront().x, 0.0f, _c.getFront().z);
 
-	_box = new Billboard(&_pLight._pointLightShader, { new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::DiffuseMap) });
-	_box->_rigidBody._position.z = -1.0f;
-	_box->_rigidBody._position.y = 1.0f;
-	_box->_transform.scale(glm::vec3(1.0f, 1.0f, 1.0f), 0.25f);
+	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::A))
+		moveForce -= glm::vec3(_c.getRight().x, 0.0f, _c.getRight().z);
+	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::D))
+		moveForce += glm::vec3(_c.getRight().x, 0.0f, _c.getRight().z);
+
+	float speed = 1.5f;
+	moveForce *= speed;
+
+	_c.setPosition(_c.getPosition() + moveForce * dt);
+
+	//load view matrix
+	_mainShader->use();
+	_mainShader->loadViewMatrix(_c);
+
+	static float elapsedTime = 0.0f;
+	elapsedTime += dt;
+
+	//_ghoul->_rigidBody._position.y = sinf(elapsedTime);
+
 
 }
 
 bool MainScene::init()
 {
-	for (auto x : _lightCubes)
-		x->setActive(true);
-	_box->setActive(true);
+	//make the shader
+	if (_mainShader == nullptr) {
+		_mainShader = new Cappuccino::Shader("mainVert.vert", "mainFrag.frag");
+		_mainShader->use();
+		_mainShader->loadProjectionMatrix(1600.0f, 1000.0f);
+	}
+
+	//set the cursor so that its locked to the window
+	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	//initialize the ghoul and the bullet
+	if (_ghoul == nullptr) {
+		_ghoul = new Empty(*_mainShader, {}, { new Cappuccino::Mesh("rectangle_test.obj") });
+		_ghoul->setColour(glm::vec3(0.5f, 0.2f, 0.8f));
+	}
+
+	_ghoul->setActive(true);
 
 	_initialized = true;
 	_shouldExit = false;
-
 	return true;
 }
 
 bool MainScene::exit()
 {
+	_ghoul->setActive(false);
+
 	_initialized = false;
 	_shouldExit = true;
-
-	return true;
-}
-
-void MainScene::childUpdate(float dt)
-{
-
-	if (isEvent(Events::A))
-		c.setPosition(c.getPosition() - glm::vec3(1.0f, 0.0f, 0.f) * dt);
-
-	_pLight._pointLightShader.use();
-	_pLight._pointLightShader.loadViewMatrix(c);
-	_billboardShader.use();
-	_billboardShader.loadViewMatrix(c);
-
-	static float u = 0.0f;
-	static bool reverse = false;
-
-	if (reverse)
-		u -= dt;
-	else
-		u += dt;
-
-	if (u >= 1.0f) {
-		u = 1.0f;
-		reverse = true;
-	}
-	else if (u <= 0.0f) {
-		u = 0.0f;
-		reverse = false;
-	}
-
-
-	_pLight.getPositions()[0] = (glm::vec3(-0.5f * glm::smoothstep(0.0f, 1.0f, u), 1.0f, 5.f * glm::smoothstep(0.0f, 1.0f, u)));
-	_lightCubes[0]->_rigidBody._position = _pLight.getPositions()[0];
-	_pLight.getPositions()[1] = (glm::vec3(-4.f * glm::smoothstep(1.0f, 0.0f, u), 1.0f, 0.0f));
-	_lightCubes[1]->_rigidBody._position = _pLight.getPositions()[1];
-	_pLight.resendLights();
-
+	return false;
 }
 
 void MainScene::mouseFunction(double xpos, double ypos)
@@ -99,12 +85,27 @@ void MainScene::mouseFunction(double xpos, double ypos)
 		firstMouse = false;
 	}
 
-	GLfloat xOffset = xpos - lastX;
-	GLfloat yOffset = lastY - ypos;
+	float xOffset = xpos - lastX;
+	float yOffset = lastY - ypos;
 	lastX = static_cast<float>(xpos);
 	lastY = static_cast<float>(ypos);
 
-	c.doMouseMovement(xOffset, yOffset);
-	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	_c.doMouseMovement(xOffset, yOffset);
+}
 
+Empty::Empty(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Texture*>& textures, const std::vector<Cappuccino::Mesh*>& meshes)
+	:Cappuccino::GameObject(SHADER, textures, meshes)
+{
+	_rigidBody.setGrav(false);
+}
+
+void Empty::childUpdate(float dt)
+{
+//	_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), dt * 90.0f);
+}
+
+void Empty::setColour(const glm::vec3& colour)
+{
+	_shader.use();
+	_shader.setUniform("colour", colour);
 }
