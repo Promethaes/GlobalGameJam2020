@@ -47,6 +47,30 @@ void MainScene::childUpdate(float dt)
 	static float elapsedTime = 0.0f;
 	elapsedTime += dt;
 
+	static float u = 0.0f;
+	static bool reverse = false;
+	static float scalar = 0.0f;
+
+	if (reverse)
+		u -= dt;
+	else
+		u += dt;
+
+	if (u >= 1.0f) {
+		u = 1.0f;
+		reverse = true;
+	}
+	else if (u <= 0.0f) {
+		u = 0.0f;
+		reverse = false;
+	}
+	scalar = glm::smoothstep(1.0f, 2.0f, u);
+	_p1->_transform._scaleMat[0].x *= scalar;
+	//for (auto x : Cappuccino::GameObject::gameObjects) {
+	//	x->_transform._scaleMat[0].x = offset;
+	//	x->_transform._scaleMat[1].y = offset;
+	//	x->_transform._scaleMat[2].z = offset;
+	//}
 
 	//_ghoul->_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), 90*dt);
 
@@ -64,7 +88,6 @@ bool MainScene::init()
 		_table = new Empty(_pLight._pointLightShader, { new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::DiffuseMap),
 			new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::SpecularMap) }, { new Cappuccino::Mesh("desk.obj") });
 		_table->_rigidBody._position = -glm::vec3(3.0f, 3.0f, 10.0f);
-		_table->_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 	}
 	if (_machineBox == nullptr) {
 		_machineBox = new Empty(_pLight._pointLightShader, { new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::DiffuseMap),
@@ -79,7 +102,7 @@ bool MainScene::init()
 	}
 	if (_p2 == nullptr) {
 		_p2 = new HandInteract(_pLight._pointLightShader, { new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::DiffuseMap),
-			new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::SpecularMap),new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::EmissionMap) },2);
+			new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::SpecularMap),new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::EmissionMap) }, 2);
 		_p2->_rigidBody._position = _table->_rigidBody._position;
 		_p2->_rigidBody._position.y += 1.0f;
 	}
