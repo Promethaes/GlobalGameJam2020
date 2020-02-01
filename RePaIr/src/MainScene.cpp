@@ -2,7 +2,7 @@
 
 MainScene::MainScene(bool yn)
 	:Cappuccino::Scene(yn), _in(true, std::nullopt),
-	_pLight(glm::vec2(1600.0f, 1000.0f), { /*defaultLight*/glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 512.0f)
+	_pLight(glm::vec2(1600.0f, 1000.0f), { /*defaultLight*/glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 512.0f)
 {
 	_c.setPosition(glm::vec3(-3.168742f, -1.000000f, -6.126548f));
 	_c.getFront() = glm::vec3(0.011849f, -0.243615f, -0.969800f);
@@ -15,20 +15,20 @@ void MainScene::childUpdate(float dt)
 {
 	//calculate camera movement
 	auto moveForce = glm::vec3(0.0f, 0.0f, 0.0f);
-	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::W))
-		moveForce += glm::vec3(_c.getFront().x, 0.0f, _c.getFront().z);
-	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::S))
-		moveForce -= glm::vec3(_c.getFront().x, 0.0f, _c.getFront().z);
-
-	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::A))
-		moveForce -= glm::vec3(_c.getRight().x, 0.0f, _c.getRight().z);
-	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::D))
-		moveForce += glm::vec3(_c.getRight().x, 0.0f, _c.getRight().z);
-
-	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::SPACE))
-		moveForce += glm::vec3(0.0f, 1.0f, 0.0f);
-	if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::LEFT_SHIFT))
-		moveForce -= glm::vec3(0.0f, 1.0f, 0.0f);
+	//if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::W))
+	//	moveForce += glm::vec3(_c.getFront().x, 0.0f, _c.getFront().z);
+	//if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::S))
+	//	moveForce -= glm::vec3(_c.getFront().x, 0.0f, _c.getFront().z);
+	//
+	//if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::A))
+	//	moveForce -= glm::vec3(_c.getRight().x, 0.0f, _c.getRight().z);
+	//if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::D))
+	//	moveForce += glm::vec3(_c.getRight().x, 0.0f, _c.getRight().z);
+	//
+	//if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::SPACE))
+	//	moveForce += glm::vec3(0.0f, 1.0f, 0.0f);
+	//if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::LEFT_SHIFT))
+	//	moveForce -= glm::vec3(0.0f, 1.0f, 0.0f);
 
 
 
@@ -61,12 +61,33 @@ bool MainScene::init()
 
 	//initialize the ghoul and the bullet
 	if (_table == nullptr) {
-		_table = new Empty(_pLight._pointLightShader, { new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::DiffuseMap) }, { new Cappuccino::Mesh("desk.obj") });
+		_table = new Empty(_pLight._pointLightShader, { new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::DiffuseMap),
+			new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::SpecularMap) }, { new Cappuccino::Mesh("desk.obj") });
 		_table->_rigidBody._position = -glm::vec3(3.0f, 3.0f, 10.0f);
 		_table->_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 	}
+	if (_machineBox == nullptr) {
+		_machineBox = new Empty(_pLight._pointLightShader, { new Cappuccino::Texture("yellow.png",Cappuccino::TextureType::DiffuseMap),
+			new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::SpecularMap) }, { new Cappuccino::Mesh("testSquare.obj") });
+		_machineBox->_rigidBody._position = _table->_rigidBody._position;
+	}
+	if (_p1 == nullptr) {
+		_p1 = new HandInteract(_pLight._pointLightShader, { new Cappuccino::Texture("white.png",Cappuccino::TextureType::DiffuseMap),
+			new Cappuccino::Texture("white.png",Cappuccino::TextureType::SpecularMap),new Cappuccino::Texture("white.png",Cappuccino::TextureType::EmissionMap) });
+		_p1->_rigidBody._position = _table->_rigidBody._position;
+		_p1->_rigidBody._position.y += 1.0f;
+	}
+	if (_p2 == nullptr) {
+		_p2 = new HandInteract(_pLight._pointLightShader, { new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::DiffuseMap),
+			new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::SpecularMap),new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::EmissionMap) },2);
+		_p2->_rigidBody._position = _table->_rigidBody._position;
+		_p2->_rigidBody._position.y += 1.0f;
+	}
 
 	_table->setActive(true);
+	_machineBox->setActive(true);
+	_p1->setActive(true);
+	_p2->setActive(true);
 
 	_initialized = true;
 	_shouldExit = false;
@@ -100,7 +121,7 @@ void MainScene::mouseFunction(double xpos, double ypos)
 	lastX = static_cast<float>(xpos);
 	lastY = static_cast<float>(ypos);
 
-	_c.doMouseMovement(xOffset, yOffset);
+	//_c.doMouseMovement(xOffset, yOffset);
 }
 
 Empty::Empty(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Texture*>& textures, const std::vector<Cappuccino::Mesh*>& meshes)
@@ -111,4 +132,52 @@ Empty::Empty(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Tex
 
 void Empty::childUpdate(float dt)
 {
+}
+
+HandInteract::HandInteract(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Texture*>& textures, unsigned playerNum)
+	:GameObject(SHADER, textures, { new Cappuccino::Mesh("testSquare.obj") }), _in(true, std::nullopt)
+{
+	auto loader = Cappuccino::HitBoxLoader("./Assets/Meshes/testSquare.obj");
+	for (auto x : loader._boxes)
+		_rigidBody._hitBoxes.push_back(x);
+	_rigidBody.setGrav(false);
+	_playerNum = playerNum;
+}
+
+void HandInteract::childUpdate(float dt)
+{
+	auto moveForce = glm::vec3(0.0f, 0.0f, 0.0f);
+	if (_playerNum == 1) {
+		if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::W))
+			moveForce += glm::vec3(0.0f, 1.0f, 0.0f);
+		if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::S))
+			moveForce -= glm::vec3(0.0f, 1.0f, 0.0f);
+
+		if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::A))
+			moveForce -= glm::vec3(1.0f, 0.0f, 0.0f);
+		if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::D))
+			moveForce += glm::vec3(1.0f, 0.0f, 0.0f);
+	}
+	if (_playerNum == 2) {
+		if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::UP_ARROW))
+			moveForce += glm::vec3(0.0f, 1.0f, 0.0f);
+		if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::DOWN_ARROW))
+			moveForce -= glm::vec3(0.0f, 1.0f, 0.0f);
+
+		if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::LEFT_ARROW))
+			moveForce -= glm::vec3(1.0f, 0.0f, 0.0f);
+		if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::RIGHT_ARROW))
+			moveForce += glm::vec3(1.0f, 0.0f, 0.0f);
+	}
+
+	//if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::SPACE))
+	//	moveForce += glm::vec3(0.0f, 1.0f, 0.0f);
+	//if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::LEFT_SHIFT))
+	//	moveForce -= glm::vec3(0.0f, 1.0f, 0.0f);
+
+
+
+	float speed = 1.5f;
+	moveForce *= speed;
+	_rigidBody.setVelocity(moveForce);
 }

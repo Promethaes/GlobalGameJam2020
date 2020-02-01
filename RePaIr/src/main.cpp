@@ -14,7 +14,7 @@ using Texture = Cappuccino::Texture;
 
 constexpr GLuint  SCR_WIDTH = 1600;
 constexpr GLuint  SCR_HEIGHT = 1000;
-constexpr GLchar* SCR_TITLE = "RePaIr";
+constexpr GLchar* SCR_TITLE = "Brew Daddy";
 
 #pragma endregion
 
