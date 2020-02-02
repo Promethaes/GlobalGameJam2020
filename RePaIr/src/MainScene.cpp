@@ -3,7 +3,8 @@
 
 MainScene::MainScene(bool yn)
 	:Cappuccino::Scene(yn), _in(true, std::nullopt),
-	_pLight(glm::vec2(1600.0f, 1000.0f), { /*defaultLight*/glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 512.0f)
+	_pLight(glm::vec2(1600.0f, 1000.0f), { /*defaultLight*/glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 512.0f),
+	_mainChain({Event("getOrder"),Event("grabBeans"),Event("grindBeans")})
 {
 	_c.setPosition(glm::vec3(-3.168742f, -1.000000f, -6.126548f));
 	_c.getFront() = glm::vec3(0.011849f, -0.243615f, -0.969800f);
@@ -65,7 +66,7 @@ void MainScene::childUpdate(float dt)
 		u = 0.0f;
 		reverse = false;
 	}
-	scalar = 1.0f + 0.1f * glm::smoothstep(0.0f, 1.f, u);
+	scalar = 1.0f + 0.01f * glm::smoothstep(0.0f, 1.f, u);
 	_pLight._pointLightShader.setUniform("scalar", scalar);
 	//for (auto x : Cappuccino::GameObject::gameObjects) {
 	//	x->_transform._scaleMat[0].x = offset;
@@ -75,6 +76,14 @@ void MainScene::childUpdate(float dt)
 
 	//_ghoul->_transform.rotate(glm::vec3(0.0f, 1.0f, 0.0f), 90*dt);
 
+	printf("%f,%f,%f\n", _p1->_rigidBody._position.x, _p1->_rigidBody._position.y, _p1->_rigidBody._position.z);
+
+	if (!_mainChain._events[0]._completed) {
+		
+	}
+	else if (_mainChain._events[0]._completed && !_mainChain._events[1]._completed) {
+
+	}//and so on...
 
 }
 
@@ -195,6 +204,16 @@ void HandInteract::childUpdate(float dt)
 		if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::RIGHT_ARROW))
 			moveForce += glm::vec3(1.0f, 0.0f, 0.0f);
 	}
+
+	//-3.437498,-2.175001,-10.000000 left
+	if (_playerNum == 1 && _rigidBody._position.x >= -3.43f)
+		_rigidBody._position.x = -3.43f;
+	//-2.499994,-2.175001,-10.000000 right
+	if (_playerNum == 2 && _rigidBody._position.x <= -2.49f)
+		_rigidBody._position.x = -2.49f;
+	if (_rigidBody._position.y <= -3.0f)
+		_rigidBody._position.y = -3.0f;
+
 
 	//if (_in.keyboard->keyPressed(Cappuccino::KeyEvent::SPACE))
 	//	moveForce += glm::vec3(0.0f, 1.0f, 0.0f);

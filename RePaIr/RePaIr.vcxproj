@@ -96,6 +96,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Billboard.cpp" />
+    <ClCompile Include="src\EventChain.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MainScene.cpp" />
   </ItemGroup>
@@ -104,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Billboard.h" />
+    <ClInclude Include="include\EventChain.h" />
     <ClInclude Include="include\MainScene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -18,6 +18,9 @@
     <ClCompile Include="src\MainScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\EventChain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="include\reeee.txt">
@@ -29,6 +32,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\Billboard.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EventChain.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

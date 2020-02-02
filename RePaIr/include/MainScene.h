@@ -5,6 +5,8 @@
 #include "Cappuccino/PointLight.h"
 #include "Cappuccino/HitBoxLoader.h"
 
+#include "EventChain.h"
+
 class MachineInteract : public Cappuccino::GameObject {
 public:
 	MachineInteract(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Texture*>& textures, const std::vector<Cappuccino::Mesh*>& meshes,const Cappuccino::HitBox& triggerVolume);
@@ -13,8 +15,13 @@ public:
 
 	virtual void trigger() = 0;
 	Cappuccino::HitBox _triggerVolume;
+
+	void setTrigger() { _isTriggered = true; }
 private:
+	bool _isTriggered = false;
 };
+
+
 
 class HandInteract : public Cappuccino::GameObject {
 public:
@@ -46,6 +53,7 @@ public:
 
 	void mouseFunction(double xpos, double ypos) override;
 private:
+	EventChain _mainChain;
 	Cappuccino::PointLight _pLight;
 	Cappuccino::CappInput _in;
 
