@@ -4,6 +4,7 @@
 #include "Cappuccino/CappInput.h"
 #include "Cappuccino/PointLight.h"
 #include "Cappuccino/HitBoxLoader.h"
+#include "Cappuccino/SoundSystem.h"
 
 #include "EventChain.h"
 
@@ -13,14 +14,29 @@ public:
 
 	void childUpdate(float dt) override;
 
-	virtual void trigger() = 0;
 	Cappuccino::HitBox _triggerVolume;
 
-	void setTrigger() { _isTriggered = true; }
+	bool isTriggered() { return _isTriggered; }
+	void  setTrigger(bool yn) { _isTriggered = yn; }
+
+	float _machineTimer = 0.0f;
+protected:
+	//return true when done
+	virtual void turnOn(float dt) = 0;
 private:
 	bool _isTriggered = false;
 };
 
+
+class Grinder : public MachineInteract {
+public:
+	Grinder(const Cappuccino::Shader& SHADER, const std::vector<Cappuccino::Texture*>& textures, const std::vector<Cappuccino::Mesh*>& meshes, const Cappuccino::HitBox& triggerVolume);
+
+	Cappuccino::Sound _onSound;
+
+	void turnOn(float dt) override;
+	bool _playedSound = false;
+};
 
 
 class HandInteract : public Cappuccino::GameObject {
@@ -53,6 +69,8 @@ public:
 
 	void mouseFunction(double xpos, double ypos) override;
 private:
+	Grinder* _grinder = nullptr;
+
 	EventChain _mainChain;
 	Cappuccino::PointLight _pLight;
 	Cappuccino::CappInput _in;
