@@ -3,7 +3,7 @@
 
 MainScene::MainScene(bool yn)
 	:Cappuccino::Scene(yn), _in(true, std::nullopt),
-	_pLight(glm::vec2(1600.0f, 1000.0f), { /*defaultLight*/glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0.0f,0.0f,0.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 512.0f),
+	_pLight(glm::vec2(1600.0f, 1000.0f), { /*defaultLight*/glm::vec3(0.0f,2.0f,1.0f),glm::vec3(0.0f,1.0f,1.0f),glm::vec3(0.0f,1.0f,1.0f) }, glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 512.0f),
 	_mainChain({ Event("getOrder"),Event("grabBeans"),Event("grindBeans") })
 {
 	_c.setPosition(glm::vec3(-3.168742f, -1.000000f, -6.126548f));
@@ -129,6 +129,8 @@ bool MainScene::init()
 			new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::SpecularMap),new Cappuccino::Texture("defaultNorm.png",Cappuccino::TextureType::EmissionMap) },
 			{ new Cappuccino::Mesh("BeanGrindBox.obj") },Cappuccino::HitBox(glm::vec3(0.0f,0.0f,0.0f),glm::vec3(1.0f,1.0f,1.0f)));
 		_grinder->_rigidBody._position = _p1->_rigidBody._position;
+		_grinder->_rigidBody._position.x += 0.5f;
+		_grinder->_rigidBody._position.y -= 1.0f;
 	}
 
 
